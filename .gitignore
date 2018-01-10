@@ -36,7 +36,3 @@ npm-debug.log
 
 # testing
 coverage
-
-# production
-build
-nginx/public/**/*
