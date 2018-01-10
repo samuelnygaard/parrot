@@ -20,6 +20,10 @@ Self-hosted Localization Management Platform built with Go and Angular 2.
 - Manage your project's team, assign collaborators and their roles.
 - Control API Client access for your projects.
 
+# TODO: 
+- Web app routing is broken, use the hashbang approach?
+- Handle CORS
+
 ## Building from source and try it out
 
 Start out by cloning this repo:
@@ -76,7 +80,8 @@ And to view the web app simply navigate to http://localhost:8080, it should open
 
 ## Configuration
 
-TODO
+TODO: explain API AppConfig object
+explain web app config via `parrot/web-app/src/environments/environment.ts`
 
 ## License
 This project is licensed under the [MIT](https://github.com/anthonynsimon/parrot/blob/master/LICENSE) license.
