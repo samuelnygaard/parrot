@@ -1,13 +1,3 @@
-export const AppConfig = {
-    apiUrl: 'http://localhost:9090/api/v1',
-};
-
-export interface ExportFormat {
-    name: string;
-    extension: string;
-    apiIdent: string;
-}
-
 export const UserRoles = [
     'owner',
     'editor',
@@ -37,6 +27,12 @@ export const ErrorMap = {
     'UpdateProjectClient': {
         'AlreadyExists': 'The provided name is already in use for this project.',
     },
+}
+
+export interface ExportFormat {
+    name: string;
+    extension: string;
+    apiIdent: string;
 }
 
 export const LocaleExportFormats = [
