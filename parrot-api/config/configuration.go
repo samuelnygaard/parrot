@@ -13,6 +13,7 @@ type AppConfig struct {
 	MigrationStrategy string
 }
 
+// TODO: add config from conf file function
 func FromEnv() (*AppConfig, error) {
 	port, ok := os.LookupEnv("PARROT_API_PORT")
 	if !ok {
