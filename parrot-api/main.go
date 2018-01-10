@@ -52,12 +52,7 @@ func main() {
 
 	router := chi.NewRouter()
 	router.Use(
-		func(next http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
-				next.ServeHTTP(w, r)
-			})
-		},
+		api.Cors,
 		middleware.Recoverer,
 		middleware.RequestID,
 		middleware.RealIP,
