@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import FileSaver from 'file-saver';
+import * as FileSaver from 'file-saver';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
