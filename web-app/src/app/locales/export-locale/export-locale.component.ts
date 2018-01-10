@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { LocalesService } from './../services/locales.service';
-import { ExportFormat } from './../../app.constants';
+import { ExportFormat } from './../model';
 import { ErrorsService } from './../../shared/errors.service';
 
 @Component({

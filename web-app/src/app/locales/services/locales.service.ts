@@ -6,9 +6,8 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 
 import { APIService } from './../../shared/api.service';
-import { Locale, LocaleInfo } from './../model';
-import { LocalesList } from './../../app.constants';
-import { LocaleExportFormats, ExportFormat } from './../../app.constants';
+import { Locale, LocaleInfo, ExportFormat } from './../model';
+import { LocalesList, LocaleExportFormats } from './../../app.constants';
 
 @Injectable()
 export class LocalesService {

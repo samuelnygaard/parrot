@@ -29,12 +29,6 @@ export const ErrorMap = {
     },
 }
 
-export interface ExportFormat {
-    name: string;
-    extension: string;
-    apiIdent: string;
-}
-
 export const LocaleExportFormats = [
     { apiIdent: 'keyvaluejson', name: 'Key Value JSON', extension: '.json' },
     { apiIdent: 'po', name: 'Gettext', extension: '.po' },
