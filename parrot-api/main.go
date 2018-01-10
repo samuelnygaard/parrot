@@ -9,9 +9,9 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/anthonynsimon/parrot/parrot-api/api"
 	"github.com/anthonynsimon/parrot/parrot-api/auth"
+	"github.com/anthonynsimon/parrot/parrot-api/config"
 	"github.com/anthonynsimon/parrot/parrot-api/datastore"
 	"github.com/anthonynsimon/parrot/parrot-api/logger"
-	"github.com/joho/godotenv"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 )
@@ -25,20 +25,17 @@ func init() {
 
 // TODO: refactor this into cli to start server
 func main() {
-	// init environment variables
-	err := godotenv.Load()
+	conf, err := config.FromEnv()
 	if err != nil {
-		logrus.Info(err)
+		logrus.Fatal(err)
 	}
 
 	// init and ping datastore
-	dbName := os.Getenv("PARROT_API_DB")
-	dbURL := os.Getenv("PARROT_API_DB_URL")
-	if dbName == "" || dbURL == "" {
-		logrus.Fatal("no db set in env")
+	if conf.DBName == "" || conf.DBConn == "" {
+		logrus.Fatal("Database not properly configured.")
 	}
 
-	ds, err := datastore.NewDatastore(dbName, dbURL)
+	ds, err := datastore.NewDatastore(conf.DBName, conf.DBConn)
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -53,7 +50,7 @@ func main() {
 		return true
 	})
 
-	migrate(dbName, ds)
+	migrate(conf, ds)
 
 	router := chi.NewRouter()
 	router.Use(
@@ -70,54 +67,32 @@ func main() {
 		middleware.StripSlashes,
 	)
 
-	signingKey := os.Getenv("PARROT_AUTH_SIGNING_KEY")
-	if signingKey == "" {
-		logrus.Fatal("no auth signing key set")
-	}
-	issuerName := os.Getenv("PARROT_AUTH_ISSUER_NAME")
-	if signingKey == "" {
-		logrus.Warn("no auth issuer name set, resorting to default")
-		issuerName = "parrot-default"
-	}
-
-	tp := auth.TokenProvider{Name: issuerName, SigningKey: []byte(signingKey)}
+	tp := auth.TokenProvider{Name: conf.AuthIssuer, SigningKey: []byte(conf.AuthSigningKey)}
 	router.Mount("/api/v1/auth", auth.NewRouter(ds, tp))
 	router.Mount("/api/v1", api.NewRouter(ds, tp))
 
 	// config and init server
-	addr := ":9990"
-	if os.Getenv("PARROT_API_HOST_PORT") != "" {
-		addr = os.Getenv("PARROT_API_HOST_PORT")
-	}
-
+	bindInterface := ":" + conf.Port
 	s := &http.Server{
-		Addr:           addr,
+		Addr:           bindInterface,
 		Handler:        router,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	logrus.Info(fmt.Sprintf("server listening on %s", addr))
+	logrus.Info(fmt.Sprintf("server listening on %s", bindInterface))
 
 	logrus.Fatal(s.ListenAndServe())
 }
 
-func migrate(dbName string, ds datastore.Store) {
-	migrationStrategy := os.Getenv("PARROT_DB_MIGRATION_STRATEGY")
-	if migrationStrategy != "" {
-		logrus.Infof("migration strategy is set to '%s'", migrationStrategy)
-	}
-
-	dirPath := os.Getenv("PARROT_DB_MIGRATIONS_DIR")
-	if dirPath == "" {
-		dirPath = fmt.Sprintf("./datastore/%s/migrations", dbName)
-		logrus.Infof("migrations directory not set, using default one: '%s'", dirPath)
-	}
+func migrate(conf *config.AppConfig, ds datastore.Store) {
+	logrus.Infof("migration strategy is set to '%s'", conf.MigrationStrategy)
+	dirPath := fmt.Sprintf("./datastore/%s/migrations", conf.DBName)
 
 	var fn func(string) error
 
-	switch migrationStrategy {
+	switch conf.MigrationStrategy {
 	// Case when we want to start clean each time
 	case "down,up":
 		fn = func(path string) error {
@@ -138,7 +113,7 @@ func migrate(dbName string, ds datastore.Store) {
 	case "down":
 		fn = ds.MigrateDown
 	default:
-		logrus.Fatalf("could not recognize migration strategy '%s'", migrationStrategy)
+		logrus.Fatalf("could not recognize migration strategy '%s'", conf.MigrationStrategy)
 	}
 
 	logrus.Info("migrating...")
