@@ -85,7 +85,7 @@ func main() {
 	router.Mount("/api/v1", api.NewRouter(ds, tp))
 
 	// config and init server
-	addr := ":8080"
+	addr := ":9990"
 	if os.Getenv("PARROT_API_HOST_PORT") != "" {
 		addr = os.Getenv("PARROT_API_HOST_PORT")
 	}
