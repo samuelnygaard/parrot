@@ -29,7 +29,7 @@ The easiest way to get started is using `docker` and `docker-compose`. Simply cl
 $ git clone https://github.com/anthonynsimon/parrot.git
 $ cd parrot
 $ ./scripts/buildweb.sh
-$ sudo ./scripts/start.sh
+$ ./scripts/start.sh
 ```
 
 > Please note that to build the web app, `npm` and `angular-cli`are required:
