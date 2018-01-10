@@ -50,8 +50,6 @@ func main() {
 		return true
 	})
 
-	migrate(conf, ds)
-
 	router := chi.NewRouter()
 	router.Use(
 		func(next http.Handler) http.Handler {
@@ -84,44 +82,6 @@ func main() {
 	logrus.Info(fmt.Sprintf("server listening on %s", bindInterface))
 
 	logrus.Fatal(s.ListenAndServe())
-}
-
-func migrate(conf *config.AppConfig, ds datastore.Store) {
-	logrus.Infof("migration strategy is set to '%s'", conf.MigrationStrategy)
-	dirPath := fmt.Sprintf("./datastore/%s/migrations", conf.DBName)
-
-	var fn func(string) error
-
-	switch conf.MigrationStrategy {
-	// Case when we want to start clean each time
-	case "down,up":
-		fn = func(path string) error {
-			err := ds.MigrateDown(path)
-			if err != nil {
-				return err
-			}
-			err = ds.MigrateUp(path)
-			if err != nil {
-				return err
-			}
-			return nil
-		}
-	// Case when we want to apply migrations if needed
-	case "up":
-		fn = ds.MigrateUp
-	// Case when we want to simply drop everything
-	case "down":
-		fn = ds.MigrateDown
-	default:
-		logrus.Fatalf("could not recognize migration strategy '%s'", conf.MigrationStrategy)
-	}
-
-	logrus.Info("migrating...")
-	err := fn(dirPath)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	logrus.Info("migration completed successfully")
 }
 
 func blockAndRetry(d time.Duration, fn func() bool) {
