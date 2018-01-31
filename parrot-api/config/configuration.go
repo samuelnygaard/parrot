@@ -7,11 +7,11 @@ import (
 )
 
 type AppConfig struct {
-	Port           string `yaml:port`
-	DBName         string `yaml:dbName`
-	DBConn         string `yaml:dbConn`
-	AuthIssuer     string `yaml:authIssuer`
-	AuthSigningKey string `yaml:authSigningKey`
+	Port           string `yaml:"port"`
+	DBName         string `yaml:"dbName"`
+	DBConn         string `yaml:"dbConn"`
+	AuthIssuer     string `yaml:"authIssuer"`
+	AuthSigningKey string `yaml:"authSigningKey"`
 }
 
 func FromYaml(data []byte) (*AppConfig, error) {
@@ -21,6 +21,24 @@ func FromYaml(data []byte) (*AppConfig, error) {
 		return nil, err
 	}
 	return conf, nil
+}
+
+func SetOrDefault(conf *AppConfig) {
+	if conf.Port == "" {
+		conf.Port = "9990"
+	}
+	if conf.DBName == "" {
+		conf.DBName = "postgres"
+	}
+	if conf.DBConn == "" {
+		conf.DBConn = "postgres://postgres@localhost:5432/parrot?sslmode=disable"
+	}
+	if conf.AuthIssuer == "" {
+		conf.AuthIssuer = "parrot@localhost"
+	}
+	if conf.AuthSigningKey == "" {
+		conf.AuthSigningKey = "secret"
+	}
 }
 
 func FromEnv() (*AppConfig, error) {
