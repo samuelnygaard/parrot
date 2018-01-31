@@ -6,12 +6,12 @@ CREATE TABLE projects (
     project_name VARCHAR(1024) NOT NULL
 );
 
-CREATE TABLE translation_keys (
+CREATE TABLE project_strings (
     PRIMARY KEY (id),
     id UUID DEFAULT uuid_generate_v4(),
-    translation_key VARCHAR(2048) NOT NULL,
+    string VARCHAR(2048) NOT NULL,
     project_id UUID NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-    UNIQUE (project_id, translation_key)
+    UNIQUE (project_id, string)
 );
 
 CREATE TABLE locales (
@@ -27,8 +27,8 @@ CREATE TABLE project_translations (
     translation TEXT,
     locale_code VARCHAR(5) NOT NULL REFERENCES locales (code),
     project_id UUID NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-    translation_key_id UUID NOT NULL REFERENCES translation_keys (id) ON DELETE CASCADE,
-    UNIQUE (project_id, translation_key_id, locale_code)
+    string_id UUID NOT NULL REFERENCES project_strings (id) ON DELETE CASCADE,
+    UNIQUE (project_id, string_id, locale_code)
 );
 
 CREATE TABLE users (
